@@ -204,7 +204,7 @@ nav {
 }
 
 .hero-title {
-    font-size: clamp(3rem, 8vw, 5rem);
+    font-size: clamp(3rem, 8vw, 6.5rem);
     line-height: 1.1;
     margin-bottom: 1.5rem;
     background: linear-gradient(135deg, #ffffff, var(--accent));
