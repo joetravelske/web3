@@ -733,6 +733,12 @@ section {
     border-color: var(--primary);
 }
 
+.form-group input.error,
+.form-group textarea.error {
+    border-color: #e74c3c;
+    background-color: #fdf2f2;
+}
+
 .form-group textarea {
     min-height: 150px;
     resize: vertical;
