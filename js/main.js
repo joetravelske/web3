@@ -110,88 +110,190 @@ document.querySelectorAll('[data-aos]').forEach(el => {
     observer.observe(el);
 });
 
-// Form validation for contact page
+// Web3Forms Contact Form Submission
 const contactForm = document.getElementById('contactForm');
 if (contactForm) {
-    contactForm.addEventListener('submit', function(e) {
+    contactForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
-        const formData = new FormData(this);
-        const data = Object.fromEntries(formData);
+        // Get form elements
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const submitText = this.querySelector('.submit-text');
+        const loadingText = this.querySelector('.loading-text');
+        const resultDiv = document.getElementById('form-result');
+        
+        // Clear previous result
+        if (resultDiv) {
+            resultDiv.style.display = 'none';
+            resultDiv.innerHTML = '';
+        }
+        
+        // Validate required fields
+        const nameField = document.getElementById('name');
+        const emailField = document.getElementById('email');
+        const messageField = document.getElementById('message');
+        let isValid = true;
         
         // Simple validation
-        let isValid = true;
-        const requiredFields = ['name', 'email', 'message'];
-        
-        requiredFields.forEach(field => {
-            if (!data[field] || data[field].trim() === '') {
+        [nameField, emailField, messageField].forEach(field => {
+            if (field && (!field.value || field.value.trim() === '')) {
                 isValid = false;
-                const input = this.querySelector(`[name="${field}"]`);
-                if (input) {
-                    input.classList.add('error');
-                }
+                field.classList.add('error');
             }
         });
         
         if (!isValid) {
             // Show error message
-            const errorDiv = document.getElementById('formError') || document.createElement('div');
-            errorDiv.id = 'formError';
-            errorDiv.textContent = 'Please fill in all required fields';
-            errorDiv.style.cssText = 'color: #e74c3c; background: #fdf2f2; padding: 10px; border-radius: 5px; margin: 10px 0; text-align: center;';
-            
-            if (!document.getElementById('formError')) {
-                contactForm.insertBefore(errorDiv, contactForm.firstChild);
+            if (resultDiv) {
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = `
+                    <div style="color: #e74c3c; background: #fdf2f2; padding: 1rem; border-radius: 8px; text-align: center; border-left: 4px solid #e74c3c;">
+                        <p style="margin: 0;">Please fill in all required fields marked with *</p>
+                    </div>
+                `;
+                resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
             return;
         }
         
-        // Remove any existing error messages
-        const existingError = document.getElementById('formError');
-        if (existingError) existingError.remove();
-        
         // Show loading state
-        const submitBtn = this.querySelector('button[type="submit"]');
-        const originalText = submitBtn ? submitBtn.textContent : 'Submit';
         if (submitBtn) {
-            submitBtn.textContent = 'Sending...';
             submitBtn.disabled = true;
+            if (submitText) submitText.style.display = 'none';
+            if (loadingText) loadingText.style.display = 'inline';
         }
         
-        // Simulate form submission (replace with actual AJAX call)
-        setTimeout(() => {
-            // Show success message
-            const successDiv = document.createElement('div');
-            successDiv.id = 'formSuccess';
-            successDiv.textContent = 'Thank you! Joe will get back to you within 24 hours.';
-            successDiv.style.cssText = 'color: #27ae60; background: #f3faf7; padding: 15px; border-radius: 5px; margin: 15px 0; text-align: center; font-weight: 600;';
+        try {
+            // Prepare form data
+            const formData = new FormData(this);
             
-            contactForm.innerHTML = '';
-            contactForm.appendChild(successDiv);
+            // Add additional information
+            formData.append('website', 'Joeventure Tours');
+            formData.append('page_url', window.location.href);
             
+            // Set replyto to the submitted email
+            if (emailField && emailField.value) {
+                formData.set('replyto', emailField.value);
+            }
+            
+            // Submit to Web3Forms
+            const response = await fetch('https://api.web3forms.com/submit', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const result = await response.json();
+            
+            // Show result message
+            if (resultDiv) {
+                resultDiv.style.display = 'block';
+                
+                if (result.success) {
+                    // Success
+                    resultDiv.innerHTML = `
+                        <div style="color: #27ae60; background: #f3faf7; padding: 1.5rem; border-radius: 8px; text-align: center; border-left: 4px solid #27ae60;">
+                            <h4 style="margin-bottom: 0.5rem; color: #27ae60;">🎉 Message Sent Successfully!</h4>
+                            <p>Thank you for your inquiry. <strong>Joe will personally respond within 24 hours.</strong></p>
+                            <p style="font-size: 0.9rem; margin-top: 1rem;">
+                                You'll also receive a copy of this message at the email you provided.
+                            </p>
+                        </div>
+                    `;
+                    
+                    // Reset form
+                    this.reset();
+                    
+                    // Track successful submission in Google Analytics
+                    if (typeof gtag !== 'undefined') {
+                        gtag('event', 'submit', {
+                            'event_category': 'contact',
+                            'event_label': 'web3forms_success',
+                            'value': 1
+                        });
+                    }
+                } else {
+                    // Error
+                    resultDiv.innerHTML = `
+                        <div style="color: #e74c3c; background: #fdf2f2; padding: 1.5rem; border-radius: 8px; text-align: center; border-left: 4px solid #e74c3c;">
+                            <h4 style="margin-bottom: 0.5rem; color: #e74c3c;">❌ Something Went Wrong</h4>
+                            <p>${result.message || 'Please try again or contact Joe directly via WhatsApp.'}</p>
+                            <p style="font-size: 0.9rem; margin-top: 1rem;">
+                                You can also reach Joe directly at <strong>+254 705 924974</strong>
+                            </p>
+                        </div>
+                    `;
+                    
+                    // Track failed submission
+                    if (typeof gtag !== 'undefined') {
+                        gtag('event', 'exception', {
+                            'event_category': 'contact',
+                            'event_label': 'web3forms_error',
+                            'value': 1
+                        });
+                    }
+                }
+                
+                // Scroll to result
+                resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            
+        } catch (error) {
+            console.error('Form submission error:', error);
+            
+            // Show error message
+            if (resultDiv) {
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = `
+                    <div style="color: #e74c3c; background: #fdf2f2; padding: 1.5rem; border-radius: 8px; text-align: center; border-left: 4px solid #e74c3c;">
+                        <h4 style="margin-bottom: 0.5rem; color: #e74c3c;">⚠️ Network Error</h4>
+                        <p>Unable to send message. Please try again or contact Joe directly via WhatsApp.</p>
+                        <p style="margin-top: 1rem;">
+                            <a href="https://wa.me/254705924974?text=Hi%20Joe!%20I%20tried%20to%20contact%20you%20via%20your%20website" 
+                               class="btn btn-primary" 
+                               style="padding: 0.5rem 1rem; font-size: 0.9rem; display: inline-block;">
+                                💬 Chat on WhatsApp Instead
+                            </a>
+                        </p>
+                    </div>
+                `;
+                resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            
+        } finally {
             // Reset button state
             if (submitBtn) {
-                submitBtn.textContent = originalText;
                 submitBtn.disabled = false;
+                if (submitText) submitText.style.display = 'inline';
+                if (loadingText) loadingText.style.display = 'none';
             }
-            
-            // Track form submission in Google Analytics
-            if (typeof gtag !== 'undefined') {
-                gtag('event', 'submit', {
-                    'event_category': 'contact',
-                    'event_label': 'contact_form_submission'
-                });
-            }
-            
-        }, 1500);
+        }
     });
     
+    // Add CSS animation for loading spinner
+    if (!document.querySelector('#loading-spinner-style')) {
+        const style = document.createElement('style');
+        style.id = 'loading-spinner-style';
+        style.textContent = `
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+            input.error, textarea.error {
+                border-color: #e74c3c !important;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
     // Remove error class on input
-    contactForm.querySelectorAll('input, textarea').forEach(input => {
-        input.addEventListener('input', function() {
+    contactForm.querySelectorAll('input, textarea, select').forEach(field => {
+        field.addEventListener('input', function() {
             this.classList.remove('error');
-            const errorDiv = document.getElementById('formError');
-            if (errorDiv) errorDiv.remove();
+            const resultDiv = document.getElementById('form-result');
+            if (resultDiv) {
+                resultDiv.style.display = 'none';
+                resultDiv.innerHTML = '';
+            }
         });
     });
 }

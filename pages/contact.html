@@ -122,7 +122,24 @@
                 <!-- Booking Form -->
                 <div class="contact-form" data-aos="fade-left">
                     <h3 style="margin-bottom: 1.5rem; color: var(--secondary);">Send Us a Message</h3>
-                    <form id="contactForm">
+                    
+                    <!-- Web3Forms Success/Error Message Container -->
+                    <div id="form-result" style="display: none; margin-bottom: 2rem;"></div>
+                    
+                    <form action="https://api.web3forms.com/submit" method="POST" id="contactForm">
+                        <!-- Web3Forms Configuration -->
+                        <input type="hidden" name="access_key" value="de06d3ef-9579-40ea-b794-b69abef4731f">
+                        <input type="hidden" name="subject" value="New Safari Inquiry from Joeventure Tours Website">
+                        <input type="hidden" name="from_name" value="Joeventure Tours Website">
+                        <input type="hidden" name="replyto" value="">
+                        
+                        <!-- Honeypot spam protection -->
+                        <input type="checkbox" name="botcheck" style="display: none;">
+                        
+                        <!-- Add page URL for tracking -->
+                        <input type="hidden" name="page_url" value="https://joetours.co.ke/contact.html">
+                        <input type="hidden" name="website" value="Joeventure Tours">
+
                         <div class="form-group">
                             <label for="name">Full Name *</label>
                             <input type="text" id="name" name="name" required placeholder="John Doe">
@@ -190,7 +207,10 @@
                         </div>
 
                         <button type="submit" class="btn btn-primary" style="width: 100%;">
-                            Send Inquiry
+                            <span class="submit-text">Send Inquiry</span>
+                            <span class="loading-text" style="display: none;">
+                                Sending... <span style="display: inline-block; animation: spin 1s linear infinite;">⟳</span>
+                            </span>
                         </button>
 
                         <p style="text-align: center; margin-top: 1rem; color: var(--gray); font-size: 0.9rem;">
@@ -283,6 +303,7 @@
                         <li><a href="packages.html">Safari Packages</a></li>
                         <li><a href="gallery.html">Gallery</a></li>
                         <li><a href="about.html">About Us</a></li>
+						<li><a href="blog.html">Blog</a></li>
                         <li><a href="contact.html">Contact</a></li>
                     </ul>
                 </div>
