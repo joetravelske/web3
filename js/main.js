@@ -55,9 +55,10 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 const slides = document.querySelectorAll('.hero-slide');
 let currentSlide = 0;
 let slideInterval;
+let isSlideLoading = false;
 
 function nextSlide() {
-    if (slides.length === 0) return;
+    if (slides.length === 0 || isSlideLoading) return;
 
     const nextIndex = (currentSlide + 1) % slides.length;
     const nextSlideElement = slides[nextIndex];
@@ -74,13 +75,16 @@ function nextSlide() {
         return;
     }
 
+    isSlideLoading = true;
     const image = new Image();
     image.onload = () => {
         nextSlideElement.style.backgroundImage = `url("${backgroundUrl}")`;
         delete nextSlideElement.dataset.background;
+        isSlideLoading = false;
         activateNextSlide();
     };
     image.onerror = () => {
+        isSlideLoading = false;
         console.error(`Unable to load hero image: ${backgroundUrl}`);
     };
     image.src = backgroundUrl;
