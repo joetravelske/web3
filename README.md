@@ -144,6 +144,14 @@ Want to change colors? Edit these CSS variables in `css/style.css`:
 
 The site keeps all 65 original JPEGs in `images/` and uses separate resized display copies in `images/optimized/`. The display set is about 23 MB instead of 153 MB (an 85% reduction); opening a gallery photo still uses the original full-size file. Original photographs are never replaced.
 
+## ☁️ Deploying to Cloudflare Workers
+
+The repository-root `wrangler.jsonc` explicitly configures this static site, and `.assetsignore` excludes Git history and local build/tooling files from public asset uploads. Deploy from the repository root with:
+
+```bash
+npx wrangler deploy
+```
+
 For the next batch of photos:
 
 - Keep the original in `images/` and create a matching display copy in `images/optimized/`, resized to at most 1,920 px on the longest edge and compressed to about 200–500 KB.
