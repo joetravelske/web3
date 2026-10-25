@@ -202,6 +202,11 @@ document.querySelectorAll('.gallery-full').forEach(carousel => {
         frame.setAttribute('role', 'group');
         frame.setAttribute('aria-roledescription', 'slide');
         frame.setAttribute('aria-label', `${index + 1} of ${slides.length}`);
+        const image = slide.querySelector('img');
+        if (image) {
+            image.dataset.displaySrc = image.dataset.displaySrc || image.src;
+            image.removeAttribute('src');
+        }
         slide.removeAttribute('data-aos');
         slide.removeAttribute('data-aos-delay');
         frame.appendChild(slide);
@@ -230,19 +235,25 @@ document.querySelectorAll('.gallery-full').forEach(carousel => {
 
     controls.append(previous, count, next);
     carousel.replaceChildren(viewport, controls);
+    const categoryHeading = carousel.parentElement.querySelector('h3');
+    if (categoryHeading) carousel.setAttribute('aria-label', categoryHeading.textContent.trim());
 
     let activeIndex = 0;
     let pointerStartX = null;
     let didSwipe = false;
+    let isNearViewport = false;
 
     function showSlide(index) {
         activeIndex = (index + slides.length) % slides.length;
         track.style.transform = `translateX(-${activeIndex * 100}%)`;
         Array.from(track.children).forEach((slide, slideIndex) => {
             slide.setAttribute('aria-hidden', String(slideIndex !== activeIndex));
-            const image = slide.querySelector('img');
-            if (image) image.loading = slideIndex === activeIndex ? 'eager' : 'lazy';
         });
+        const activeImage = track.children[activeIndex].querySelector('img');
+        if (isNearViewport && activeImage && !activeImage.src) {
+            activeImage.loading = 'eager';
+            activeImage.src = activeImage.dataset.displaySrc;
+        }
         count.textContent = `${String(activeIndex + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
     }
 
@@ -275,6 +286,14 @@ document.querySelectorAll('.gallery-full').forEach(carousel => {
         if (event.key === 'ArrowLeft') showSlide(activeIndex - 1);
         if (event.key === 'ArrowRight') showSlide(activeIndex + 1);
     });
+
+    const carouselObserver = new IntersectionObserver(entries => {
+        if (!entries.some(entry => entry.isIntersecting)) return;
+        isNearViewport = true;
+        showSlide(activeIndex);
+        carouselObserver.disconnect();
+    }, { rootMargin: '300px 0px' });
+    carouselObserver.observe(carousel);
 
     showSlide(0);
 });
