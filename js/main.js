@@ -168,6 +168,92 @@ if (galleryCarousel) {
     });
 }
 
+// Full gallery category carousels
+document.querySelectorAll('.gallery-full').forEach(carousel => {
+    const slides = Array.from(carousel.querySelectorAll(':scope > .gallery-item'));
+    if (slides.length === 0) return;
+
+    carousel.classList.add('gallery-page-carousel');
+    carousel.setAttribute('role', 'region');
+    carousel.setAttribute('aria-roledescription', 'carousel');
+
+    const viewport = document.createElement('div');
+    viewport.className = 'gallery-carousel-viewport';
+    const track = document.createElement('div');
+    track.className = 'gallery-carousel-track';
+    track.setAttribute('tabindex', '0');
+    track.setAttribute('aria-label', 'Use the arrow keys to browse photos');
+
+    slides.forEach((slide, index) => {
+        const frame = document.createElement('div');
+        frame.className = 'gallery-carousel-slide';
+        frame.setAttribute('role', 'group');
+        frame.setAttribute('aria-roledescription', 'slide');
+        frame.setAttribute('aria-label', `${index + 1} of ${slides.length}`);
+        slide.removeAttribute('data-aos');
+        slide.removeAttribute('data-aos-delay');
+        frame.appendChild(slide);
+        track.appendChild(frame);
+    });
+    viewport.appendChild(track);
+
+    const controls = document.createElement('div');
+    controls.className = 'gallery-carousel-controls';
+
+    const previous = document.createElement('button');
+    previous.className = 'gallery-carousel-button';
+    previous.type = 'button';
+    previous.setAttribute('aria-label', 'Previous photo');
+    previous.textContent = '\u2190';
+
+    const count = document.createElement('span');
+    count.className = 'gallery-carousel-count';
+    count.setAttribute('aria-live', 'polite');
+
+    const next = document.createElement('button');
+    next.className = 'gallery-carousel-button';
+    next.type = 'button';
+    next.setAttribute('aria-label', 'Next photo');
+    next.textContent = '\u2192';
+
+    controls.append(previous, count, next);
+    carousel.replaceChildren(viewport, controls);
+
+    let activeIndex = 0;
+    let pointerStartX = null;
+
+    function showSlide(index) {
+        activeIndex = (index + slides.length) % slides.length;
+        track.style.transform = `translateX(-${activeIndex * 100}%)`;
+        Array.from(track.children).forEach((slide, slideIndex) => {
+            slide.setAttribute('aria-hidden', String(slideIndex !== activeIndex));
+        });
+        count.textContent = `${String(activeIndex + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
+    }
+
+    previous.addEventListener('click', () => showSlide(activeIndex - 1));
+    next.addEventListener('click', () => showSlide(activeIndex + 1));
+    track.addEventListener('pointerdown', event => {
+        if (event.pointerType === 'mouse' && event.button !== 0) return;
+        pointerStartX = event.clientX;
+    });
+    track.addEventListener('pointerup', event => {
+        if (pointerStartX === null) return;
+        const distance = event.clientX - pointerStartX;
+        if (Math.abs(distance) > 40) showSlide(activeIndex + (distance < 0 ? 1 : -1));
+        pointerStartX = null;
+    });
+    track.addEventListener('pointercancel', () => {
+        pointerStartX = null;
+    });
+    track.addEventListener('keydown', event => {
+        if (event.key === 'ArrowLeft') showSlide(activeIndex - 1);
+        if (event.key === 'ArrowRight') showSlide(activeIndex + 1);
+    });
+
+    showSlide(0);
+});
+
 // Simple AOS implementation
 const observerOptions = {
     threshold: 0.1,
