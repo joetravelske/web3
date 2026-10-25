@@ -217,6 +217,15 @@ nav {
     animation: fadeInUp 1s ease;
 }
 
+.hero-eyebrow {
+    margin-bottom: 1.15rem;
+    color: var(--sun);
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+}
+
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -255,6 +264,13 @@ nav {
     gap: 1.5rem;
     justify-content: flex-start;
     flex-wrap: wrap;
+}
+
+.hero-trust-note {
+    margin-top: 1.5rem;
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
 }
 
 /* Buttons */
@@ -762,11 +778,21 @@ section {
     margin-bottom: 1rem;
 }
 
+.cta-content .section-label {
+    color: var(--sun);
+}
+
 .cta-content p {
     font-size: 1.3rem;
     margin-bottom: 2.5rem;
     opacity: 0.95;
     line-height: 1.6;
+}
+
+.cta-content p:not(.section-label) {
+    max-width: 680px;
+    margin-right: auto;
+    margin-left: auto;
 }
 
 .cta-buttons {
@@ -1604,9 +1630,14 @@ section {
 
     .hero-title {
         font-size: clamp(2.1rem, 9vw, 3.5rem);
-        letter-spacing: 0.04em;
+        letter-spacing: 0.01em;
         line-height: 1.02;
         margin-bottom: 0.75rem;
+    }
+
+    .hero-eyebrow {
+        font-size: 0.7rem;
+        letter-spacing: 0.14em;
     }
 
     .hero-subtitle {
@@ -1623,6 +1654,11 @@ section {
     .hero-buttons .btn {
         width: min(100%, 320px);
         padding: 1rem 1.25rem;
+    }
+
+    .hero-trust-note {
+        max-width: 320px;
+        font-size: 0.78rem;
     }
 
     .section-title,

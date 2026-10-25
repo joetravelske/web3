@@ -58,10 +58,32 @@ let slideInterval;
 
 function nextSlide() {
     if (slides.length === 0) return;
-    
-    slides[currentSlide].classList.remove('active');
-    currentSlide = (currentSlide + 1) % slides.length;
-    slides[currentSlide].classList.add('active');
+
+    const nextIndex = (currentSlide + 1) % slides.length;
+    const nextSlideElement = slides[nextIndex];
+    const backgroundUrl = nextSlideElement.dataset.background;
+
+    function activateNextSlide() {
+        slides[currentSlide].classList.remove('active');
+        currentSlide = nextIndex;
+        nextSlideElement.classList.add('active');
+    }
+
+    if (!backgroundUrl) {
+        activateNextSlide();
+        return;
+    }
+
+    const image = new Image();
+    image.onload = () => {
+        nextSlideElement.style.backgroundImage = `url("${backgroundUrl}")`;
+        delete nextSlideElement.dataset.background;
+        activateNextSlide();
+    };
+    image.onerror = () => {
+        console.error(`Unable to load hero image: ${backgroundUrl}`);
+    };
+    image.src = backgroundUrl;
 }
 
 function startSlider() {

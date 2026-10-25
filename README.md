@@ -75,7 +75,7 @@ joeventure-website/
 - Smooth animations and transitions
 - Professional color scheme (Orange/Green/Gold)
 - Mobile-first responsive design
-- Fast loading with optimized images
+- Lazy-loaded gallery and page images; the homepage loads its first hero photo before deferring the other slides
 
 **Functionality:**
 - Image lightbox gallery (click to enlarge)
@@ -139,6 +139,20 @@ Want to change colors? Edit these CSS variables in `css/style.css`:
 **CSS not loading?**
 - Make sure `css/style.css` exists
 - Check the path in HTML: `<link rel="stylesheet" href="css/style.css">`
+
+## 📷 Adding Photos and Videos Without Slowing the Site
+
+The current `images/` folder contains roughly 153 MB of photos. Before adding more, keep original files backed up outside the published site and create web-ready copies:
+
+- Photos: convert to WebP (or AVIF with a WebP/JPEG fallback), resize large originals to about 2,000 px on the longest edge, and aim for roughly 200–500 KB per photo.
+- Keep an original-quality copy separately for print; do not use it as the page thumbnail.
+- Use descriptive, lowercase names with hyphens, such as `masai-mara-lion-sunrise-01.webp`.
+- For videos, use MP4/H.264 for broad compatibility, keep clips short and compressed, and provide a poster thumbnail. Avoid autoplaying a large video or loading every video on the gallery page.
+- Add photos to a clearly named destination or story section, then provide descriptive alt text for each image.
+- Use `loading="lazy"` and `decoding="async"` on images below the first screen. Keep the logo and the single first-screen hero image eager so the page opens quickly.
+- After publishing, check the site on mobile data and confirm that the image sizes and gallery ordering look right.
+
+For a batch of 50 new media files, first sort them into a few groups (for example destinations, wildlife, landscapes, people, and video), select the strongest images for the homepage, and optimize the rest for the gallery. Keep a simple list of filenames, locations, captions, and alt text alongside the originals; this makes adding gallery entries consistent and avoids uploading duplicate or oversized files.
 
 **GitHub push failed?**
 - Make sure you created the repository on GitHub first
