@@ -210,16 +210,16 @@ if (safariVideos) {
     for (let videoNumber = 1; videoNumber <= 19; videoNumber += 1) {
         const videoId = String(videoNumber).padStart(2, '0');
         const card = document.createElement('div');
-        card.className = 'gallery-video-card';
+        card.className = 'gallery-item gallery-video-card';
 
         const video = document.createElement('video');
         video.controls = true;
         video.preload = 'none';
-        video.poster = `../images/new-safari/video-posters/safari-clip-${videoId}.webp`;
+        video.dataset.poster = `../images/new-safari/video-posters/safari-clip-${videoId}.webp`;
         video.setAttribute('aria-label', `Safari video ${videoId}`);
 
         const source = document.createElement('source');
-        source.src = `../videos/optimized/safari-clip-${videoId}.mp4`;
+        source.dataset.src = `../videos/optimized/safari-clip-${videoId}.mp4`;
         source.type = 'video/mp4';
         video.appendChild(source);
 
@@ -232,7 +232,8 @@ if (safariVideos) {
 }
 
 // Full gallery category carousels
-document.querySelectorAll('.gallery-full').forEach(carousel => {
+document.querySelectorAll('.gallery-full, .gallery-video-carousel').forEach(carousel => {
+    const isVideoCarousel = carousel.matches('.gallery-video-carousel');
     const slides = Array.from(carousel.querySelectorAll(':scope > .gallery-item'));
     if (slides.length === 0) return;
 
@@ -245,7 +246,7 @@ document.querySelectorAll('.gallery-full').forEach(carousel => {
     const track = document.createElement('div');
     track.className = 'gallery-carousel-track';
     track.setAttribute('tabindex', '0');
-    track.setAttribute('aria-label', 'Use the arrow keys to browse photos');
+    track.setAttribute('aria-label', `Use the arrow keys to browse ${isVideoCarousel ? 'videos' : 'photos'}`);
 
     slides.forEach((slide, index) => {
         const frame = document.createElement('div');
@@ -271,7 +272,7 @@ document.querySelectorAll('.gallery-full').forEach(carousel => {
     const previous = document.createElement('button');
     previous.className = 'gallery-carousel-button';
     previous.type = 'button';
-    previous.setAttribute('aria-label', 'Previous photo');
+    previous.setAttribute('aria-label', `Previous ${isVideoCarousel ? 'video' : 'photo'}`);
     previous.textContent = '\u2190';
 
     const count = document.createElement('span');
@@ -281,7 +282,7 @@ document.querySelectorAll('.gallery-full').forEach(carousel => {
     const next = document.createElement('button');
     next.className = 'gallery-carousel-button';
     next.type = 'button';
-    next.setAttribute('aria-label', 'Next photo');
+    next.setAttribute('aria-label', `Next ${isVideoCarousel ? 'video' : 'photo'}`);
     next.textContent = '\u2192';
 
     controls.append(previous, count, next);
@@ -294,23 +295,43 @@ document.querySelectorAll('.gallery-full').forEach(carousel => {
     let didSwipe = false;
     let isNearViewport = false;
 
-    function showSlide(index) {
+    function showSlide(index, autoplay = false) {
+        if (isVideoCarousel) {
+            track.querySelectorAll('video').forEach(video => video.pause());
+        }
+
         activeIndex = (index + slides.length) % slides.length;
         track.style.transform = `translateX(-${activeIndex * 100}%)`;
         Array.from(track.children).forEach((slide, slideIndex) => {
             slide.setAttribute('aria-hidden', String(slideIndex !== activeIndex));
         });
-        const activeImage = track.children[activeIndex].querySelector('img');
+        const activeSlide = track.children[activeIndex];
+        const activeImage = activeSlide.querySelector('img');
         if (isNearViewport && activeImage && !activeImage.src) {
             activeImage.loading = 'eager';
             activeImage.src = activeImage.dataset.displaySrc;
+        }
+        if (isVideoCarousel && (isNearViewport || autoplay)) {
+            const video = activeSlide.querySelector('video');
+            const source = video.querySelector('source');
+            video.poster = video.dataset.poster;
+            if (!source.src) {
+                source.src = source.dataset.src;
+                video.load();
+            }
+            if (autoplay) {
+                video.play().catch(error => {
+                    console.error(`Unable to autoplay safari video ${activeIndex + 1}:`, error);
+                });
+            }
         }
         count.textContent = `${String(activeIndex + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
     }
 
     previous.addEventListener('click', () => showSlide(activeIndex - 1));
-    next.addEventListener('click', () => showSlide(activeIndex + 1));
+    next.addEventListener('click', () => showSlide(activeIndex + 1, isVideoCarousel));
     track.addEventListener('pointerdown', event => {
+        if (isVideoCarousel && event.target.closest('video')) return;
         if (event.pointerType === 'mouse' && event.button !== 0) return;
         pointerStartX = event.clientX;
         track.setPointerCapture(event.pointerId);
