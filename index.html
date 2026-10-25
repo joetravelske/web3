@@ -83,13 +83,13 @@
     <!-- Hero Section -->
     <section class="hero">
         <div class="hero-slider">
-            <div class="hero-slide active" style="background-image: url('images/sunset-with-truck.jpg');">
-                <div class="hero-overlay"></div>
-            </div>
-            <div class="hero-slide active" style="background-image: url('images/truck-elephant-approaching.jpg');">
-                <div class="hero-overlay"></div>
-            </div>
             <div class="hero-slide active" style="background-image: url('images/giraffe-sunset-1.jpg');">
+                <div class="hero-overlay"></div>
+            </div>
+            <div class="hero-slide" style="background-image: url('images/truck-elephant-approaching.jpg');">
+                <div class="hero-overlay"></div>
+            </div>
+            <div class="hero-slide" style="background-image: url('images/sunset-with-truck.jpg');">
                 <div class="hero-overlay"></div>
             </div>
             <div class="hero-slide" style="background-image: url('images/lion-male.jpg');">
@@ -264,30 +264,53 @@
                 <p class="section-subtitle">Real moments from real adventures</p>
             </div>
             
-            <div class="gallery-grid-preview">
-                <div class="gallery-item" data-aos="zoom-in">
-                    <img src="images/giraffe-feeding-road.jpg" alt="Giraffe encounter">
-                    <div class="gallery-overlay">
-                        <h4>Up Close Encounters</h4>
+            <div class="gallery-carousel" role="region" aria-roledescription="carousel" aria-label="Safari photo highlights">
+                <div class="gallery-carousel-viewport">
+                    <div class="gallery-carousel-track">
+                        <div class="gallery-carousel-slide" role="group" aria-roledescription="slide" aria-label="1 of 4">
+                            <div class="gallery-item">
+                                <img src="images/giraffe-feeding-road.jpg" alt="Giraffe encounter">
+                                <div class="gallery-overlay">
+                                    <h4>Up Close Encounters</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gallery-carousel-slide" role="group" aria-roledescription="slide" aria-label="2 of 4" aria-hidden="true">
+                            <div class="gallery-item">
+                                <img src="images/male-lion-3.jpg" alt="Lion resting in the savannah">
+                                <div class="gallery-overlay">
+                                    <h4>Big Five Sightings</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gallery-carousel-slide" role="group" aria-roledescription="slide" aria-label="3 of 4" aria-hidden="true">
+                            <div class="gallery-item">
+                                <img src="images/picnic-safari.jpg" alt="Safari picnic in the bush">
+                                <div class="gallery-overlay">
+                                    <h4>Safari Experiences</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gallery-carousel-slide" role="group" aria-roledescription="slide" aria-label="4 of 4" aria-hidden="true">
+                            <div class="gallery-item">
+                                <img src="images/crowned-crane.jpg" alt="Crowned cranes in the wild">
+                                <div class="gallery-overlay">
+                                    <h4>Birdwatching Paradise</h4>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="gallery-item" data-aos="zoom-in" data-aos-delay="100">
-                    <img src="images/male-lion-3.jpg" alt="Lion king">
-                    <div class="gallery-overlay">
-                        <h4>Big Five Sightings</h4>
+                <div class="gallery-carousel-controls">
+                    <button class="gallery-carousel-button gallery-carousel-prev" type="button" aria-label="Previous photo">&#8592;</button>
+                    <div class="gallery-carousel-dots" aria-label="Choose a photo">
+                        <button class="active" type="button" aria-label="Show photo 1" aria-pressed="true"></button>
+                        <button type="button" aria-label="Show photo 2" aria-pressed="false"></button>
+                        <button type="button" aria-label="Show photo 3" aria-pressed="false"></button>
+                        <button type="button" aria-label="Show photo 4" aria-pressed="false"></button>
                     </div>
-                </div>
-                <div class="gallery-item" data-aos="zoom-in" data-aos-delay="200">
-                    <img src="images/picnic-safari.jpg" alt="Bush picnic">
-                    <div class="gallery-overlay">
-                        <h4>Safari Experiences</h4>
-                    </div>
-                </div>
-                <div class="gallery-item" data-aos="zoom-in" data-aos-delay="300">
-                    <img src="images/crowned-crane.jpg" alt="Crown cranes">
-                    <div class="gallery-overlay">
-                        <h4>Birdwatching Paradise</h4>
-                    </div>
+                    <span class="gallery-carousel-count" aria-live="polite">01 / 04</span>
+                    <button class="gallery-carousel-button gallery-carousel-next" type="button" aria-label="Next photo">&#8594;</button>
                 </div>
             </div>
             

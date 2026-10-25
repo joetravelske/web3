@@ -65,10 +65,10 @@ function nextSlide() {
 }
 
 function startSlider() {
-    if (slides.length > 0) {
-        // Clear existing interval if any
-        if (slideInterval) clearInterval(slideInterval);
-        // Start new interval
+    if (slideInterval) clearInterval(slideInterval);
+    slideInterval = null;
+
+    if (slides.length > 1 && window.matchMedia('(min-width: 769px)').matches) {
         slideInterval = setInterval(nextSlide, 5000);
     }
 }
@@ -76,6 +76,7 @@ function startSlider() {
 // Initialize slider if slides exist
 if (slides.length > 0) {
     startSlider();
+    window.matchMedia('(min-width: 769px)').addEventListener('change', startSlider);
     
     // Pause slider on hover for better UX
     const heroSection = document.querySelector('.hero-slider');
@@ -88,6 +89,57 @@ if (slides.length > 0) {
             startSlider();
         });
     }
+
+}
+
+// Homepage photo carousel
+const galleryCarousel = document.querySelector('.gallery-carousel');
+if (galleryCarousel) {
+    const track = galleryCarousel.querySelector('.gallery-carousel-track');
+    const carouselSlides = Array.from(galleryCarousel.querySelectorAll('.gallery-carousel-slide'));
+    const dots = Array.from(galleryCarousel.querySelectorAll('.gallery-carousel-dots button'));
+    const count = galleryCarousel.querySelector('.gallery-carousel-count');
+    let activeIndex = 0;
+    let pointerStartX = null;
+
+    function showGallerySlide(index) {
+        activeIndex = (index + carouselSlides.length) % carouselSlides.length;
+        track.style.transform = `translateX(-${activeIndex * 100}%)`;
+
+        carouselSlides.forEach((slide, slideIndex) => {
+            slide.setAttribute('aria-hidden', String(slideIndex !== activeIndex));
+        });
+        dots.forEach((dot, dotIndex) => {
+            const isActive = dotIndex === activeIndex;
+            dot.classList.toggle('active', isActive);
+            dot.setAttribute('aria-pressed', String(isActive));
+        });
+        count.textContent = `${String(activeIndex + 1).padStart(2, '0')} / ${String(carouselSlides.length).padStart(2, '0')}`;
+    }
+
+    galleryCarousel.querySelector('.gallery-carousel-prev').addEventListener('click', () => {
+        showGallerySlide(activeIndex - 1);
+    });
+    galleryCarousel.querySelector('.gallery-carousel-next').addEventListener('click', () => {
+        showGallerySlide(activeIndex + 1);
+    });
+    dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => showGallerySlide(index));
+    });
+    track.addEventListener('pointerdown', event => {
+        pointerStartX = event.clientX;
+    });
+    track.addEventListener('pointerup', event => {
+        if (pointerStartX === null) return;
+        const distance = event.clientX - pointerStartX;
+        if (Math.abs(distance) > 40) {
+            showGallerySlide(activeIndex + (distance < 0 ? 1 : -1));
+        }
+        pointerStartX = null;
+    });
+    track.addEventListener('pointercancel', () => {
+        pointerStartX = null;
+    });
 }
 
 // Simple AOS implementation
