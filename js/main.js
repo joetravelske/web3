@@ -180,6 +180,57 @@ if (galleryCarousel) {
     }, true);
 }
 
+// Add the latest uploaded safari media to the gallery.
+const newSafariPhotos = document.querySelector('[data-new-safari-photos]');
+if (newSafariPhotos) {
+    for (let photoNumber = 1; photoNumber <= 38; photoNumber += 1) {
+        const photoId = String(photoNumber).padStart(2, '0');
+        const item = document.createElement('div');
+        item.className = 'gallery-item';
+
+        const image = document.createElement('img');
+        image.alt = `Safari photo ${photoId}`;
+        image.loading = 'lazy';
+        image.decoding = 'async';
+        image.dataset.fullsrc = `../images/new-safari/originals/safari-photo-${photoId}.jpeg`;
+        image.dataset.displaySrc = `../images/new-safari/webp/safari-photo-${photoId}.webp`;
+
+        const overlay = document.createElement('div');
+        overlay.className = 'gallery-overlay';
+        const caption = document.createElement('h4');
+        caption.textContent = `Safari photo ${photoId}`;
+        overlay.appendChild(caption);
+        item.append(image, overlay);
+        newSafariPhotos.appendChild(item);
+    }
+}
+
+const safariVideos = document.querySelector('[data-safari-videos]');
+if (safariVideos) {
+    for (let videoNumber = 1; videoNumber <= 19; videoNumber += 1) {
+        const videoId = String(videoNumber).padStart(2, '0');
+        const card = document.createElement('div');
+        card.className = 'gallery-video-card';
+
+        const video = document.createElement('video');
+        video.controls = true;
+        video.preload = 'none';
+        video.poster = `../images/new-safari/video-posters/safari-clip-${videoId}.webp`;
+        video.setAttribute('aria-label', `Safari video ${videoId}`);
+
+        const source = document.createElement('source');
+        source.src = `../videos/optimized/safari-clip-${videoId}.mp4`;
+        source.type = 'video/mp4';
+        video.appendChild(source);
+
+        const caption = document.createElement('p');
+        caption.className = 'gallery-video-caption';
+        caption.textContent = `Safari video ${videoId}`;
+        card.append(video, caption);
+        safariVideos.appendChild(card);
+    }
+}
+
 // Full gallery category carousels
 document.querySelectorAll('.gallery-full').forEach(carousel => {
     const slides = Array.from(carousel.querySelectorAll(':scope > .gallery-item'));

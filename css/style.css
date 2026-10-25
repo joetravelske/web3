@@ -624,6 +624,34 @@ section {
     height: 400px;
 }
 
+.gallery-video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.5rem;
+}
+
+.gallery-video-card {
+    overflow: hidden;
+    border-radius: 15px;
+    background: white;
+    box-shadow: 0 8px 24px rgba(26, 26, 26, 0.1);
+}
+
+.gallery-video-card video {
+    display: block;
+    width: 100%;
+    aspect-ratio: 9 / 16;
+    background: #1a1a1a;
+    object-fit: cover;
+}
+
+.gallery-video-caption {
+    margin: 0;
+    padding: 1rem 1.25rem;
+    color: var(--secondary);
+    font-weight: 600;
+}
+
 .gallery-full.gallery-page-carousel {
     display: block;
     max-width: 1100px;
