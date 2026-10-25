@@ -127,6 +127,7 @@ if (galleryCarousel) {
     const count = galleryCarousel.querySelector('.gallery-carousel-count');
     let activeIndex = 0;
     let pointerStartX = null;
+    let didSwipe = false;
 
     function showGallerySlide(index) {
         activeIndex = (index + carouselSlides.length) % carouselSlides.length;
@@ -134,6 +135,8 @@ if (galleryCarousel) {
 
         carouselSlides.forEach((slide, slideIndex) => {
             slide.setAttribute('aria-hidden', String(slideIndex !== activeIndex));
+            const image = slide.querySelector('img');
+            if (image) image.loading = slideIndex === activeIndex ? 'eager' : 'lazy';
         });
         dots.forEach((dot, dotIndex) => {
             const isActive = dotIndex === activeIndex;
@@ -153,12 +156,15 @@ if (galleryCarousel) {
         dot.addEventListener('click', () => showGallerySlide(index));
     });
     track.addEventListener('pointerdown', event => {
+        if (event.pointerType === 'mouse' && event.button !== 0) return;
         pointerStartX = event.clientX;
+        track.setPointerCapture(event.pointerId);
     });
     track.addEventListener('pointerup', event => {
         if (pointerStartX === null) return;
         const distance = event.clientX - pointerStartX;
         if (Math.abs(distance) > 40) {
+            didSwipe = true;
             showGallerySlide(activeIndex + (distance < 0 ? 1 : -1));
         }
         pointerStartX = null;
@@ -166,6 +172,12 @@ if (galleryCarousel) {
     track.addEventListener('pointercancel', () => {
         pointerStartX = null;
     });
+    track.addEventListener('click', event => {
+        if (!didSwipe) return;
+        event.preventDefault();
+        event.stopPropagation();
+        didSwipe = false;
+    }, true);
 }
 
 // Full gallery category carousels
@@ -221,12 +233,15 @@ document.querySelectorAll('.gallery-full').forEach(carousel => {
 
     let activeIndex = 0;
     let pointerStartX = null;
+    let didSwipe = false;
 
     function showSlide(index) {
         activeIndex = (index + slides.length) % slides.length;
         track.style.transform = `translateX(-${activeIndex * 100}%)`;
         Array.from(track.children).forEach((slide, slideIndex) => {
             slide.setAttribute('aria-hidden', String(slideIndex !== activeIndex));
+            const image = slide.querySelector('img');
+            if (image) image.loading = slideIndex === activeIndex ? 'eager' : 'lazy';
         });
         count.textContent = `${String(activeIndex + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
     }
@@ -236,16 +251,26 @@ document.querySelectorAll('.gallery-full').forEach(carousel => {
     track.addEventListener('pointerdown', event => {
         if (event.pointerType === 'mouse' && event.button !== 0) return;
         pointerStartX = event.clientX;
+        track.setPointerCapture(event.pointerId);
     });
     track.addEventListener('pointerup', event => {
         if (pointerStartX === null) return;
         const distance = event.clientX - pointerStartX;
-        if (Math.abs(distance) > 40) showSlide(activeIndex + (distance < 0 ? 1 : -1));
+        if (Math.abs(distance) > 40) {
+            didSwipe = true;
+            showSlide(activeIndex + (distance < 0 ? 1 : -1));
+        }
         pointerStartX = null;
     });
     track.addEventListener('pointercancel', () => {
         pointerStartX = null;
     });
+    track.addEventListener('click', event => {
+        if (!didSwipe) return;
+        event.preventDefault();
+        event.stopPropagation();
+        didSwipe = false;
+    }, true);
     track.addEventListener('keydown', event => {
         if (event.key === 'ArrowLeft') showSlide(activeIndex - 1);
         if (event.key === 'ArrowRight') showSlide(activeIndex + 1);
@@ -268,6 +293,33 @@ const observer = new IntersectionObserver((entries) => {
         }
     });
 }, observerOptions);
+
+const statCounters = document.querySelectorAll('.stat-number[data-counter]');
+if (statCounters.length > 0) {
+    const counterObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+
+            const counter = entry.target;
+            const target = Number(counter.dataset.counter);
+            const suffix = counter.dataset.suffix || '';
+            const duration = 900;
+            const start = performance.now();
+
+            function animateCounter(now) {
+                const progress = Math.min((now - start) / duration, 1);
+                const easedProgress = 1 - Math.pow(1 - progress, 3);
+                counter.textContent = `${Math.round(target * easedProgress)}${suffix}`;
+                if (progress < 1) requestAnimationFrame(animateCounter);
+            }
+
+            counterObserver.unobserve(counter);
+            requestAnimationFrame(animateCounter);
+        });
+    }, { threshold: 0.5 });
+
+    statCounters.forEach(counter => counterObserver.observe(counter));
+}
 
 // Initialize AOS observer
 document.querySelectorAll('[data-aos]').forEach(el => {
@@ -486,7 +538,7 @@ if (galleryItems.length > 0) {
             lightbox.innerHTML = `
                 <div class="lightbox-content" style="position: relative; max-width: 90%; max-height: 90%;">
                     <span class="lightbox-close" style="position: absolute; top: -50px; right: 0; color: white; font-size: 3rem; cursor: pointer; font-weight: 300; line-height: 1;">&times;</span>
-                    <img src="${this.src}" alt="${this.alt}" style="max-width: 100%; max-height: 90vh; object-fit: contain; border-radius: 10px;">
+                    <img src="${this.dataset.fullsrc || this.src}" alt="${this.alt}" style="max-width: 100%; max-height: 90vh; object-fit: contain; border-radius: 10px;">
                 </div>
             `;
             

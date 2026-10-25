@@ -142,11 +142,14 @@ Want to change colors? Edit these CSS variables in `css/style.css`:
 
 ## 📷 Adding Photos and Videos Without Slowing the Site
 
-The current `images/` folder contains roughly 153 MB of photos. Before adding more, keep original files backed up outside the published site and create web-ready copies:
+The site keeps all 65 original JPEGs in `images/` and uses separate resized display copies in `images/optimized/`. The display set is about 23 MB instead of 153 MB (an 85% reduction); opening a gallery photo still uses the original full-size file. Original photographs are never replaced.
 
-- Photos: convert to WebP (or AVIF with a WebP/JPEG fallback), resize large originals to about 2,000 px on the longest edge, and aim for roughly 200–500 KB per photo.
+For the next batch of photos:
+
+- Keep the original in `images/` and create a matching display copy in `images/optimized/`, resized to at most 1,920 px on the longest edge and compressed to about 200–500 KB.
+- Add the display copy as the page image `src` and its original as `data-fullsrc`, so the gallery remains lightweight and the lightbox retains full resolution.
+- Use descriptive, lowercase names with hyphens, such as `masai-mara-lion-sunrise-01.jpg`.
 - Keep an original-quality copy separately for print; do not use it as the page thumbnail.
-- Use descriptive, lowercase names with hyphens, such as `masai-mara-lion-sunrise-01.webp`.
 - For videos, use MP4/H.264 for broad compatibility, keep clips short and compressed, and provide a poster thumbnail. Avoid autoplaying a large video or loading every video on the gallery page.
 - Add photos to a clearly named destination or story section, then provide descriptive alt text for each image.
 - Use `loading="lazy"` and `decoding="async"` on images below the first screen. Keep the logo and the single first-screen hero image eager so the page opens quickly.
